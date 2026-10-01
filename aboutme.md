@@ -1,16 +1,17 @@
 ---
 layout: page
-title: About me
+title: ""
 subtitle: Why you'd want to go on a date with me
 ---
 
-My name is Inigo Montoya. I have the following qualities:
+My name is Amy Carrillo. I enjoy mapping and spatially quantifying the coastal and terrestrial world around me. 
 
-- I rock a great mustache
-- I'm extremely loyal to my family
+Tid bits:
+- I love skiing. 
+- I enjoy taking film photos while doing everyday life or traveling.
+- Caffeine is my reckoning.
 
-What else do you need?
+<img src="/img/Amy_paddling.jpg" alt="Me paddling with Timber at Kuoloa Beach Park." height="250">
 
-### My story
+If I'm not at my computer, you can find me walking my dog or stand up paddle boarding. And, sometimes I even mix the too!
 
-To be honest, I'm having some trouble remembering right now, so why don't you just watch [my movie](https://en.wikipedia.org/wiki/The_Princess_Bride_%28film%29) and it will answer **all** your questions.
