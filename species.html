@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reef Fish</title>
+<style>
+ body{font-family:system-ui;margin:0 auto;max-width:1100px;padding:1rem}
+ .facets a{display:inline-block;margin:0 .5rem .5rem 0;padding:.4rem .8rem;border:1px solid #ccc;border-radius:6px;text-decoration:none;color:inherit}
+ .facets a.on{background:#123;color:#fff}
+ .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.75rem}
+ .tile{border:1px solid #ddd;border-radius:8px;overflow:hidden;text-decoration:none;color:inherit;font-size:.85rem}
+ .tile img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#eee}
+ .tile div{padding:.5rem}
+</style></head>
+<body>
+<h1>Reef fish</h1>
+<div class="facets" id="facets"></div>
+<div class="grid" id="grid"></div>
+<p id="pager"></p>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const sb = createClient("https://upxnjcurblrvppzgwrto.supabase.co/rest/v1/", "sb_publishable_3FwZ2m_Ixi0pBAq1-0TQUA_AacThf3E");
+
+const PAGE = 48;
+const params = new URLSearchParams(location.search);
+const status = params.get("status");
+const page = Math.max(1, Number(params.get("page") || 1));
+const esc = s => String(s ?? "").replace(/[&<>"']/g,
+  c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const href = o => "?" + new URLSearchParams(o);
+
+let q = sb.from("species_list").select("*", { count: "exact" })
+  .order("scientific_name").range((page-1)*PAGE, page*PAGE - 1);
+if (status) q = q.eq("facet", status);
+
+const [list, facets] = await Promise.all([q, sb.from("facet_counts").select("*")]);
+if (list.error) { document.body.append("Error: " + list.error.message); throw list.error; }
+
+document.getElementById("facets").innerHTML =
+  `<a href="?" class="${status ? "" : "on"}">All</a>` +
+  facets.data.map(f =>
+    `<a href="${href({status: f.facet})}" class="${status===f.facet ? "on" : ""}">${esc(f.facet)} ${f.n}</a>`
+  ).join("");
+
+document.getElementById("grid").innerHTML = list.data.map(f => `
+  <a class="tile" href="fish.html?id=${esc(f.id)}">
+    ${f.photo_url ? `<img src="${esc(f.photo_url)}" alt="${esc(f.scientific_name)}" loading="lazy">` : `<img alt="">`}
+    <div><b>${esc(f.common_name || f.scientific_name)}</b><br><i>${esc(f.scientific_name)}</i><br>${esc(f.status_label)}</div>
+  </a>`).join("");
+
+const pages = Math.max(1, Math.ceil(list.count / PAGE));
+const base = status ? { status } : {};
+document.getElementById("pager").innerHTML =
+  (page > 1 ? `<a href="${href({...base, page: page-1})}">← Previous</a> ` : "") +
+  `Page ${page} of ${pages} ` +
+  (page < pages ? `<a href="${href({...base, page: page+1})}">Next →</a>` : "");
+</script>
+</body></html>
